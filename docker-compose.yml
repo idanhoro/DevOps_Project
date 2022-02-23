@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  db:
+    hostname: db
+    container_name: db
+    image: mariadb:latest
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: "${DB_NAME:-app}"
+      MARIADB_USER: "app"
+      MARIADB_PASSWORD: "${DB_PASS:-123456}"
+    volumes:
+      - type: bind
+        source: ./init.sql
+        target: /docker-entrypoint-initdb.d/1-init.sql
+        #healthcheck:
+        #test: out=$$(mysqladmin ping -h localhost -P 3306 -u root --password=$${DB_PASS} 2>&1); echo $$out | grep 'mysqld is alive' || { echo $$out; exit 1; }
+
+        
+
+  app:
+    hostname: app
+    container_name: app
+    build:
+      context: .
+    environment:
+      DB_NAME: "${DB_NAME:-app}"
+      DB_HOST: "${DB_HOST:-db}"
+      DB_USER: "app"
+      DB_PASS: "${DB_PASS:-123456}"
+      RUN_APP: "true"
+    depends_on:
+      - db
+    restart: on-failure
