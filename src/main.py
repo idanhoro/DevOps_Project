@@ -7,11 +7,13 @@ import mariadb
 def start():
     conn = get_db_conn()
     cursor = get_cursor(conn)
+    run = True
 
-    while os.environ.get("RUN_APP") == "true":
+    while run:
         randomNumber = random.randint(0, 255)
         insert_entry(conn, cursor, randomNumber)
         sleep(60)
+
     conn.close()
 
 
