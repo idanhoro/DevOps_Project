@@ -1,3 +1,4 @@
+
 create table if not exists randoms(
     entry_id int auto_increment, 
     random_num int not null,
@@ -5,4 +6,4 @@ create table if not exists randoms(
     primary key(entry_id)
 );
 
-GRANT ALL PRIVILEGES ON *.* TO 'app'@'%';
+GRANT ALL PRIVILEGES ON 'randoms.app' TO 'app'@'%';

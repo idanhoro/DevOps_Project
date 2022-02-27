@@ -6,25 +6,32 @@ services:
     container_name: db
     image: mariadb:latest
     environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
-      MARIADB_DATABASE: "${DB_NAME:-app}"
-      MARIADB_USER: "app"
-      MARIADB_PASSWORD: "${DB_PASS:-123456}"
-    volumes:
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"  # Generate random for root for security.
+      MARIADB_DATABASE: "${DB_NAME:-app}" # Set default database name.
+      MARIADB_USER: "app" # Set user for the database.
+      MARIADB_PASSWORD: "${DB_PASS:-123456}" #Set default password for the database's user.
+    volumes: # Set default volumes
       - type: bind
-        source: ./init.sql
-        target: /docker-entrypoint-initdb.d/1-init.sql
+        source: ./init.sql # The destination of the SQL file from the host
+        target: /docker-entrypoint-initdb.d/1-init.sql # The destination of the SQL file at the database container.
+      - type: volume
+        source: mysql_data
+        target: /var/lib/mysql
+
 
   app:
     hostname: app
     container_name: app
     build:
-      context: .
-    environment:
+      context: . # The destination of the Dockerfile need to be used to build the application container.
+    environment: # Set environment variable.
       DB_NAME: "${DB_NAME:-app}"
       DB_HOST: "${DB_HOST:-db}"
       DB_USER: "app"
       DB_PASS: "${DB_PASS:-123456}"
-    depends_on:
+    depends_on: #Set the depended on container.
       - db
-    restart: on-failure
+    restart: on-failure # If the application fail to start, it will restart the application.
+
+volumes:
+  mysql_data:
